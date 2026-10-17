@@ -1,0 +1,194 @@
+@import "tailwindcss";
+
+/* ----------------------------------------------------------------------------
+   Codecraft Solutions — design tokens
+   One source of truth. Palette sampled to match the logo (blue → purple on near-black).
+---------------------------------------------------------------------------- */
+@theme {
+  /* Brand ramp */
+  --color-brand-cyan: #2ac7f4;
+  --color-brand-blue: #2f93ff;
+  --color-brand-indigo: #5b6bff;
+  --color-brand-violet: #7c4dff;
+  --color-brand-purple: #8a3ff0;
+
+  /* Semantic surfaces — near-black with a faint blue tint so the logo blends */
+  --color-bg: #05060c;
+  --color-bg-soft: #080a14;
+  --color-surface: #0c0f1c;
+  --color-surface-2: #11152599;
+  --color-elevated: #141a2e;
+
+  /* Lines & text */
+  --color-line: #ffffff14;
+  --color-line-strong: #ffffff24;
+  --color-fg: #eef1fb;
+  --color-muted: #9aa4bd;
+  --color-faint: #6a7390;
+
+  /* States */
+  --color-success: #34d399;
+  --color-danger: #f76b7a;
+  --color-warning: #fbbf4c;
+
+  /* Fonts (wired to next/font variables in layout.tsx) */
+  --font-display: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+
+  /* Radii */
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.375rem;
+  --radius-2xl: 1.75rem;
+
+  /* Easing */
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ----------------------------------------------------------------------------
+   Base
+---------------------------------------------------------------------------- */
+:root {
+  color-scheme: dark;
+  --brand-gradient: linear-gradient(
+    120deg,
+    var(--color-brand-cyan) 0%,
+    var(--color-brand-blue) 38%,
+    var(--color-brand-violet) 74%,
+    var(--color-brand-purple) 100%
+  );
+}
+
+* {
+  border-color: var(--color-line);
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-fg);
+  font-family: var(--font-sans);
+  font-feature-settings: "cv11", "ss01";
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: color-mix(in oklab, var(--color-brand-violet) 40%, transparent);
+  color: #fff;
+}
+
+/* Headings default to the display face */
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  text-wrap: balance;
+}
+
+/* Focus ring — consistent across all interactive elements */
+:where(a, button, input, textarea, select, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-brand-blue);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Thin branded scrollbar */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--color-bg); }
+::-webkit-scrollbar-thumb {
+  background: #2a3350;
+  border-radius: 999px;
+  border: 2px solid var(--color-bg);
+}
+::-webkit-scrollbar-thumb:hover { background: #38426b; }
+
+/* ----------------------------------------------------------------------------
+   Reusable primitives (kept tiny + token-driven)
+---------------------------------------------------------------------------- */
+@layer components {
+  /* Brand gradient text */
+  .text-gradient {
+    background: var(--brand-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Hairline-bordered glass surface used by cards */
+  .surface {
+    background:
+      linear-gradient(180deg, #ffffff08, #ffffff00 40%),
+      var(--color-surface);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-xl);
+  }
+
+  /* Uppercase, letter-spaced eyebrow label (echoes the logo's "SOLUTIONS") */
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+
+  /* Soft brand glow blobs for section backgrounds */
+  .glow {
+    position: absolute;
+    border-radius: 999px;
+    filter: blur(90px);
+    opacity: 0.5;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Faint dotted grid backdrop */
+  .grid-bg {
+    background-image: radial-gradient(var(--color-line-strong) 1px, transparent 1px);
+    background-size: 28px 28px;
+    -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 0%, #000 40%, transparent 100%);
+    mask-image: radial-gradient(ellipse 70% 60% at 50% 0%, #000 40%, transparent 100%);
+  }
+}
+
+/* ----------------------------------------------------------------------------
+   Motion — restrained, consistent reveal on scroll
+---------------------------------------------------------------------------- */
+@keyframes rise {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Starts hidden on first paint (server + client match → no flash), animates in
+   only once the element is observed in view. */
+.reveal-base {
+  opacity: 0;
+  transform: translateY(16px);
+  will-change: opacity, transform;
+}
+.reveal-in {
+  animation: rise 0.7s var(--ease-out-soft) forwards;
+}
+
+/* If JS never runs, still show everything. */
+.no-js .reveal-base {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.001ms !important;
+  }
+  .reveal-base { opacity: 1; transform: none; }
+}

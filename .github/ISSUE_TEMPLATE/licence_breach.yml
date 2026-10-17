@@ -1,0 +1,33 @@
+name: Licence breach
+description: Report someone sharing, selling or publicly hosting a copy of this app
+title: "[Licence breach]: "
+labels: ["licence-breach"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for letting us know. The code may be used only for personal use: no sharing copies, no charging for it, and no public-facing copies. We look into every report and do our best to stop breaches.
+  - type: input
+    id: where
+    attributes:
+      label: Where is it?
+      description: A link to the copy, listing or post.
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What is happening?
+      options:
+        - Selling or charging for a copy
+        - Sharing copies with others
+        - Running a public website or app from it
+        - Using our name or logo
+        - Something else
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: Anything else we should know?
+      description: Please do not include anyone's personal details beyond what is public.
